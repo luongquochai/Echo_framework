@@ -5,10 +5,6 @@ import (
 )
 
 func BasicAuth(username string, password string, c echo.Context) (bool, error) {
-	if username != "admin" || password != "123" {
-		return false, nil
-	}
-
 	if username == "admin" && password == "123" {
 		//Transfer the username -> login
 		c.Set("username", username)
