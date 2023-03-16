@@ -1,16 +1,15 @@
 package handler
 
 import (
+	"echo_framework/models"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
-
 	// echojwt "github.com/labstack/echo-jwt/v4"
 	// "github.com/labstack/echo/v4/middleware"
-	"golang_projects/projects/Echo_framework/models"
 )
 
 func Login(c echo.Context) error {

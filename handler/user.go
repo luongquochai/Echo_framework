@@ -5,12 +5,20 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/golang/glog"
 	"github.com/labstack/echo/v4"
 )
 
+func init() {
+	orm.RegisterModel(new(User))
+}
+
 type User struct {
-	Name string
-	Age  int
+	Id    int64  `orm:"auto" json:"id" form:"id" query:"id"`
+	Name  string `json:"name" form:"name" query:"name"`
+	Age   int    `json:"age" form:"age" query:"age"`
+	Phone string `json:"phone" form:"phone" query:"phone`
 }
 
 var listUsers = []User{
@@ -30,6 +38,28 @@ var listUsers = []User{
 		Name: "Jack",
 		Age:  30,
 	},
+}
+
+func AddUser(c echo.Context) error {
+	user := &User{}
+	err := c.Bind(user)
+	if err != nil {
+		glog.Errorf("Bind user error: %v", err)
+		return err
+	}
+
+	glog.Infof("%v", user)
+	o := orm.NewOrm()
+
+	id, err := o.Insert(user)
+
+	if err != nil {
+		glog.Errorf("Insert user error: %v", err)
+		return err
+	}
+
+	glog.Infof("Insert user at row %d", id)
+	return c.JSON(http.StatusOK, user)
 }
 
 func GetUser(c echo.Context) error {
