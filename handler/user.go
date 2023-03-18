@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
@@ -63,15 +65,66 @@ func AddUser(c echo.Context) error {
 }
 
 func GetUser(c echo.Context) error {
-	return c.String(http.StatusOK, "api get user")
+	name := c.QueryParam("name")
+	user := &User{
+		Name: name,
+	}
+
+	glog.Infof("id %d", user.Id)
+	o := orm.NewOrm()
+
+	err := o.Read(user, "Name")
+
+	if err != nil {
+		glog.Errorf("Error reading user: %v", err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, user)
 }
 
 func UpdateUser(c echo.Context) error {
-	return c.String(http.StatusOK, "api update user")
+	user := &User{}
+	if err := c.Bind(user); err != nil {
+		glog.Errorf("bind user error: %v", err)
+		return err
+	}
+	glog.Info("request update user: %+v", user)
+	o := orm.NewOrm()
+	_, err := o.Update(user, "Name")
+
+	if err != nil {
+		glog.Errorf("Update user %s error: %v", user.Name, err)
+		return err
+	}
+	userUpdate := &User{
+		Name: user.Name,
+	}
+	o.Read(userUpdate, "Name")
+	return c.JSON(http.StatusOK, userUpdate)
+
 }
 
 func DeleteUser(c echo.Context) error {
-	return c.String(http.StatusOK, "api delete user")
+	s := c.FormValue("id")
+	id, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	glog.Info("Deleting user %d", id)
+	user := &User{
+		Id: id,
+	}
+	o := orm.NewOrm()
+	row, err := o.Delete(user)
+	if err != nil {
+		glog.Errorf("Delete user %d failed: %v", row, err)
+		return err
+	}
+
+	return c.String(http.StatusOK, fmt.Sprintf("Delete user id %d at %d", id, row))
+
 }
 
 func GetAllUsers(c echo.Context) error {

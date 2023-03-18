@@ -61,8 +61,8 @@ func main() {
 	groupUser.PUT("/add", handler.AddUser)
 	groupUser.GET("/get", handler.GetUser)
 	groupUser.GET("/get_all", handler.GetAllUsers)
-	groupUser.GET("/update", handler.UpdateUser, isAdmin)
-	groupUser.GET("/delete", handler.DeleteUser, isAdmin)
+	groupUser.POST("/update", handler.UpdateUser)
+	groupUser.DELETE("/delete", handler.DeleteUser)
 
 	server.Logger.Fatal(server.Start(":8888"))
 
